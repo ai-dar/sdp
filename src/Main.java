@@ -1,16 +1,49 @@
+import Assignment2.Adapter.PDFDocumentAdapter;
+import Assignment2.Bridge.HighlightRenderEngine;
+import Assignment2.Bridge.RenderEngine;
+import Assignment2.Bridge.SimpleRenderEngine;
+import Assignment2.Composite.DocumentGroup;
+import Assignment2.Document;
+import Assignment2.Facade.DocumentFacade;
+import Assignment2.Flyweight.DocumentFactory;
+import Assignment2.Proxy.ProxyDocument;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        DocumentFacade facade = new DocumentFacade();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        // 1. Использование Proxy для ленивой загрузки
+        System.out.println("1. Ленивая загрузка документов:");
+        facade.displayDocument("Report");
+
+        // 2. Использование декоратора для добавления водяного знака
+        System.out.println("\n2. Добавление водяного знака:");
+        facade.displayDocumentWithWatermark("Report");
+
+        // 3. Использование Flyweight для повторного использования документа
+        System.out.println("\n3. Повторное использование документа:");
+        facade.displayDocument("Report");
+
+        // 4. Использование Composite для работы с группой документов
+        System.out.println("\n4. Работа с группами документов:");
+        DocumentGroup group = new DocumentGroup();
+        group.addDocument(DocumentFactory.getDocument("Report"));
+        group.addDocument(DocumentFactory.getDocument("Presentation"));
+        group.display();
+
+        // 5. Использование Adapter для работы с PDF
+        System.out.println("\n5. Работа с PDF документами через Adapter:");
+        Document pdfDocument = new PDFDocumentAdapter("document.pdf");
+        pdfDocument.display();
+
+        // 6. Использование Bridge для рендеринга
+        System.out.println("\n6. Рендеринг документа через движок:");
+        RenderEngine simpleEngine = new SimpleRenderEngine();
+        facade.renderDocument("Report", simpleEngine);
+
+        RenderEngine highlightEngine = new HighlightRenderEngine();
+        facade.renderDocument("Report", highlightEngine);
+
     }
+
 }

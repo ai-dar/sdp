@@ -1,110 +1,103 @@
-import Assignment3.Chain.*;
-import Assignment3.Command.*;
-import Assignment3.Iterator.*;
-import Assignment3.Mediator.*;
-import Assignment3.Memento.*;
-
-import java.util.Iterator;
+import Assignment4.Observer.*;
+import Assignment4.State.Player;
+import Assignment4.Strategy.*;
+import Assignment4.Template.*;
+import Assignment4.Visitor.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Цепочка обязанностей
-        System.out.println("Chain of Responsibility:");
+        // Observer
 
-        // Создаем объекты для каждой платежной системы
-        PaymentA paymentA = new PaymentA();
-        PaymentB paymentB = new PaymentB();
-        PaymentC paymentC = new PaymentC();
+        // Создаем издателя новостей
+        NewsPublisherImpl newsPublisher = new NewsPublisherImpl();
 
-        // Устанавливаем следующего обработчика для каждой системы
-        paymentA.setNextHandler(paymentB);
-        paymentB.setNextHandler(paymentC);
+        // Создаем подписчиков: смартфон, ноутбук и планшет
+        Observer smartphoneSubscriber = new NewsSubscriberSmartphone();
+        Observer laptopSubscriber = new NewsSubscriberLaptop();
+        Observer tabletSubscriber = new NewsSubscriberTablet();
 
-        // Сумма для оплаты
-        int amountToPay = 210;
+        // Добавляем подписчиков к издателю новостей
+        newsPublisher.subscribe(smartphoneSubscriber);
+        newsPublisher.subscribe(laptopSubscriber);
+        newsPublisher.subscribe(tabletSubscriber);
 
-        // Передаем запрос на обработку оплаты
-        paymentA.handlePayment(amountToPay);
+        // Публикуем несколько новостей
+        newsPublisher.publishNews("Sports", "Team loses the match!");
+        newsPublisher.publishNews("Science", "New scientific breakthrough!");
+        newsPublisher.publishNews("Politics", "The next Presidential elections will be soon!");
 
-        // Команда
-        System.out.println("\nCommand:");
+        System.out.println();
 
-        // Создаем объект телевизора и пульта
-        Television television = new Television();
-        RemoteControl remote = new RemoteControl();
+        // State
 
-        // Назначаем команды для кнопок на пульте
-        remote.setCommand(0, new TurnOnCommand(television));
-        remote.setCommand(1, new TurnOffCommand(television));
-        remote.setCommand(2, new VolumeUpCommand(television));
-        remote.setCommand(3, new VolumeDownCommand(television));
-        remote.setCommand(4, new NextChannelCommand(television));
-        remote.setCommand(5, new PreviousChannelCommand(television));
+        // Создаем объект плеера
+        Player player = new Player();
 
-        // Нажимаем кнопки на пульте
-        remote.pressButton(0);  // Включить телевизор
-        remote.pressButton(2);  // Увеличить громкость
-        remote.pressButton(4);  // Следующий канал
-        remote.pressButton(1);  // Выключить телевизор
+        // Выполняем различные действия с плеером: игра, пауза, остановка
+        player.play();
+        player.pause();
+        player.play();
+        player.stop();
+        player.pause();
 
-        // Итератор
-        System.out.println("\nIterator:");
+        System.out.println();
 
-        // Создаем коллекции фильмов (список и массив)
-        ListMovieCollection listCollection = new ListMovieCollection();
-        listCollection.addMovie("Movie A");
-        listCollection.addMovie("Movie B");
-        listCollection.addMovie("Movie C");
+        // Strategy
 
-        ArrayMovieCollection arrayCollection = new ArrayMovieCollection(new String[]{"Movie D", "Movie E", "Movie F"});
+        // Создаем заказ на сумму 1000
+        Order order = new Order(1000);
 
-        // Итератор для списка
-        Iterator<String> listIterator = listCollection.createIterator();
-        while (listIterator.hasNext()) {
-            System.out.println("List Movie: " + listIterator.next());
-        }
+        // Устанавливаем стратегию оплаты по карте и выводим финальную сумму
+        order.setPaymentStrategy(new CardPaymentStrategy());
+        System.out.println("Final amount with card payment: " + order.calculateFinalAmount());
 
-        // Итератор для массива
-        Iterator<String> arrayIterator = arrayCollection.createIterator();
-        while (arrayIterator.hasNext()) {
-            System.out.println("Array Movie: " + arrayIterator.next());
-        }
+        // Устанавливаем стратегию оплаты из кошелька и выводим финальную сумму
+        order.setPaymentStrategy(new WalletPaymentStrategy());
+        System.out.println("Final amount with wallet payment: " + order.calculateFinalAmount());
 
-        // Посредник
-        System.out.println("\nMediator:");
+        // Устанавливаем стратегию оплаты наложенным платежом и выводим финальную сумму
+        order.setPaymentStrategy(new CashOnDeliveryStrategy());
+        System.out.println("Final amount with cash on delivery: " + order.calculateFinalAmount());
 
-        // Создаем посредника и сенсоры
-        HomeMediator mediator = new HomeMediatorImpl();
-        TemperatureSensor temperatureSensor = new TemperatureSensor(mediator);
-        HumiditySensor humiditySensor = new HumiditySensor(mediator);
-        LightSensor lightSensor = new LightSensor(mediator);
+        System.out.println();
 
-        // Отправляем данные от сенсоров через посредника
-        temperatureSensor.sendData();
-        humiditySensor.sendData();
-        lightSensor.sendData();
+        // Template
 
-        // Выводим отчет от посредника
-        mediator.printReport();
+        // Проверка качества продуктов питания
+        QualityCheck foodCheck = new FoodQualityCheck();
+        System.out.println("Food product quality check:");
+        foodCheck.checkProduct();
 
+        // Проверка качества электронной продукции
+        QualityCheck electronicsCheck = new ElectronicsQualityCheck();
+        System.out.println("Electronics product quality check:");
+        electronicsCheck.checkProduct();
 
-        // Снимок
-        System.out.println("\nMemento:");
+        System.out.println();
 
-        // Создаем текстовый редактор и управляющего снимками (Caretaker)
-        TextEditor editor = new TextEditor();
-        Caretaker caretaker = new Caretaker();
+        // Visitor
 
-        // Добавляем текст и сохраняем состояние
-        editor.addText("Hello, ");
-        caretaker.save(editor);
+        // Создаем файлы: текстовые и исполняемые
+        File textFile = new TextFile("document.txt", "This is a clean document.");
+        File bannedTextFile = new TextFile("bannedDocument.txt", "banned");
+        File executableFile = new ExecutableFile("program.exe", "safe_code");
+        File malvareExecutableFile = new ExecutableFile("suspiciousProgram.exe", "malware");
 
-        // Добавляем еще текст и выводим текущее состояние
-        editor.addText("World!");
-        System.out.println("Current Text: " + editor.getText());
+        // Создаем посетителей: антивирус и отчет
+        Visitor antivirus = new AntivirusVisitor();
+        Visitor report = new ReportVisitor();
 
-        // Восстанавливаем предыдущее состояние
-        caretaker.restore(editor);
-        System.out.println("After restoring: " + editor.getText());
+        // Антивирусная проверка
+        System.out.println("Antivirus check:");
+        textFile.accept(antivirus);
+        bannedTextFile.accept(antivirus);
+        executableFile.accept(antivirus);
+        malvareExecutableFile.accept(antivirus);
+
+        // Генерация отчета
+        System.out.println("\nGenerating report:");
+        textFile.accept(report);
+        executableFile.accept(report);
+
     }
 }
